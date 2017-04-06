@@ -8,6 +8,7 @@ import android.view.View;
 import java.io.IOException;
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -37,7 +38,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn:
-                test6();
+                test7();
                 break;
         }
     }
@@ -108,10 +109,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void test6() {
+        /**
+         * request1结束后使用request1的结果请求request2
+         */
         NetManager.get().checkUpgradeRx(5800, "LETV_X443")
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap(new Function<BaseResponse<UpgradeModel>, ObservableSource<BaseResponse<List<InstallNeceModel>>>>() {
+                .flatMap(new Function<BaseResponse<UpgradeModel>, ObservableSource<BaseResponse<List<InstallNeceModel>>>>() {//IO线程，由observeOn()指定
                     @Override
                     public ObservableSource<BaseResponse<List<InstallNeceModel>>> apply(
                             @NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) throws Exception {
@@ -119,10 +123,39 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<BaseResponse<List<InstallNeceModel>>>() {
+                .subscribe(new Consumer<BaseResponse<List<InstallNeceModel>>>() {//Android主线程，由observeOn()指定
                     @Override
                     public void accept(@NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) throws Exception {
                         Timber.d("getInstallDeceDetail onNext size = %d", listBaseResponse.entity.size());
+                    }
+                });
+    }
+    private void test7() {
+        /**
+         * request1结束后使用request1的结果请求request2，request2结果是list，对list进行分解输出
+         */
+        NetManager.get().checkUpgradeRx(5800, "LETV_X443")
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .flatMap(new Function<BaseResponse<UpgradeModel>, ObservableSource<BaseResponse<List<InstallNeceModel>>>>() {//IO线程，由observeOn()指定
+                    @Override
+                    public ObservableSource<BaseResponse<List<InstallNeceModel>>> apply(
+                            @NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) throws Exception {
+                        return NetManager.get().getInstallDeceDetailRx();
+                    }
+                })
+                .observeOn(Schedulers.io())
+                .flatMap(new Function<BaseResponse<List<InstallNeceModel>>, Observable<InstallNeceModel>>() {
+                    @Override
+                    public Observable<InstallNeceModel> apply(@NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) throws Exception {
+                        return Observable.fromIterable(listBaseResponse.entity);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<InstallNeceModel>() {
+                    @Override
+                    public void accept(@NonNull InstallNeceModel installNeceModel) throws Exception {
+                        Timber.d("test7 onNext model.name = %s", installNeceModel.name);
                     }
                 });
     }
