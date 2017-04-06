@@ -1,23 +1,28 @@
 package me.jasonzhang.netmodel.net.core;
 
 import android.annotation.SuppressLint;
+import android.util.AndroidRuntimeException;
 import android.util.ArrayMap;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import me.jasonzhang.netmodel.net.model.InstallNeceModel;
 import me.jasonzhang.netmodel.net.model.UpgradeModel;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
@@ -27,6 +32,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NetManager {
     private Retrofit retrofit = null;
     private ApiService apiService = null;
+    private RxApiService rxApiService = null;
     private HttpLoggingInterceptor loggingInterceptor;
     @SuppressLint("NewApi")
     private ArrayMap<String, String> commonParamMap = new ArrayMap<>(10);
@@ -35,16 +41,18 @@ public class NetManager {
         retrofit = new Retrofit.Builder()
                 .baseUrl(API.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(getClient())
                 .build();
         apiService = retrofit.create(ApiService.class);
+        rxApiService = retrofit.create(RxApiService.class);
     }
     private OkHttpClient getClient() {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
         //添加一个网络的拦截器
         clientBuilder.addInterceptor(new Interceptor() {
             @Override
-            public Response intercept(Chain chain) throws IOException {
+            public okhttp3.Response intercept(Chain chain) throws IOException {
                 Request originalRequest = chain.request();
                 Request request;
                 if (commonParamMap.size()>0) {//如果公共参数个数大约0，生成新的request
@@ -93,14 +101,8 @@ public class NetManager {
         commonParamMap.putAll(paraMap);
     }
 
-    public Call<BaseResponse<UpgradeModel>> checkUpgrade(int versionCode, String channel) {
-        Call<BaseResponse<UpgradeModel>> call = apiService.checkUpgrade(versionCode, channel);
-        try {
-            call.execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return call;
+    public Response<BaseResponse<UpgradeModel>> checkUpgrade(int versionCode, String channel) throws IOException {
+        return apiService.checkUpgrade(versionCode, channel).execute();
     }
     public Call<BaseResponse<UpgradeModel>> checkUpgradeAsync(int versionCode, String channel, Callback<BaseResponse<UpgradeModel>> callback) {
         Call<BaseResponse<UpgradeModel>> call = apiService.checkUpgrade(versionCode, channel);
@@ -108,7 +110,22 @@ public class NetManager {
         return call;
     }
 
-    public void getInstallDeceDetailAsync(Callback<BaseResponse<List<InstallNeceModel>>> callback) {
-        apiService.getInstallNeceDetail().enqueue(callback);
+    public Response<BaseResponse<List<InstallNeceModel>>> getInstallDeceDetail() throws IOException {
+        return apiService.getInstallNeceDetail().execute();
+    }
+
+    public Call<BaseResponse<List<InstallNeceModel>>> getInstallDeceDetailAsync(Callback<BaseResponse<List<InstallNeceModel>>> callback) {
+        Call<BaseResponse<List<InstallNeceModel>>> call = apiService.getInstallNeceDetail();
+        call.enqueue(callback);
+        return call;
+    }
+
+    public Observable<BaseResponse<UpgradeModel>> checkUpgradeRx(int versionCode, String channel) {
+        return rxApiService.checkUpgrade(versionCode, channel)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    public Observable<BaseResponse<List<InstallNeceModel>>> getInstallDeceDetailRx() {
+        return rxApiService.getInstallNeceDetail();
     }
 }
