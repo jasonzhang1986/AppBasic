@@ -38,7 +38,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn:
-                test7();
+                test8();
                 break;
         }
     }
@@ -137,9 +137,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         NetManager.get().checkUpgradeRx(5800, "LETV_X443")
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
-                .flatMap(new Function<BaseResponse<UpgradeModel>, ObservableSource<BaseResponse<List<InstallNeceModel>>>>() {//IO线程，由observeOn()指定
+                .flatMap(new Function<BaseResponse<UpgradeModel>, Observable<BaseResponse<List<InstallNeceModel>>>>() {//IO线程，由observeOn()指定
                     @Override
-                    public ObservableSource<BaseResponse<List<InstallNeceModel>>> apply(
+                    public Observable<BaseResponse<List<InstallNeceModel>>> apply(
                             @NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) throws Exception {
                         return NetManager.get().getInstallDeceDetailRx();
                     }
@@ -158,5 +158,20 @@ public class MainActivity extends Activity implements View.OnClickListener {
                         Timber.d("test7 onNext model.name = %s", installNeceModel.name);
                     }
                 });
+    }
+
+    private void test8() {
+        /**
+         * request1结束后使用request1的结果请求request2，request2结果是list，对list进行分解输出
+         * 使用lambda
+         */
+        NetManager.get().checkUpgradeRx(5800, "LETV_X443")
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .flatMap((@NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) ->  NetManager.get().getInstallDeceDetailRx())
+                .observeOn(Schedulers.io())
+                .flatMap((@NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) -> Observable.fromIterable(listBaseResponse.entity))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(installNeceModel -> Timber.d("test7 onNext model.name = %s", installNeceModel.name));
     }
 }
