@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,6 +14,8 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -136,6 +139,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
          */
         NetManager.get().checkUpgradeRx(5800, "LETV_X443")
                 .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(@NonNull Disposable disposable) throws Exception {
+                        Toast.makeText(MainActivity.this, "Begin!!!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
                 .flatMap(new Function<BaseResponse<UpgradeModel>, Observable<BaseResponse<List<InstallNeceModel>>>>() {//IO线程，由observeOn()指定
                     @Override
@@ -157,21 +167,35 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     public void accept(@NonNull InstallNeceModel installNeceModel) throws Exception {
                         Timber.d("test7 onNext model.name = %s", installNeceModel.name);
                     }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        Timber.d("Error!");
+                    }
+                }, new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        Toast.makeText(MainActivity.this, "End!!", Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
     private void test8() {
         /**
          * request1结束后使用request1的结果请求request2，request2结果是list，对list进行分解输出
-         * 使用lambda
+         * 使用lambda, 添加在开始执行的时候显示begin的提示(可以是showProgressBar)，在结束(Complete)的时候显示End的提示(隐藏ProgressBar)
          */
         NetManager.get().checkUpgradeRx(5800, "LETV_X443")
                 .subscribeOn(Schedulers.io())
+                .doOnSubscribe((@NonNull Disposable disposable) -> Toast.makeText(this, "Begin!!!", Toast.LENGTH_SHORT).show())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
-                .flatMap((@NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) ->  NetManager.get().getInstallDeceDetailRx())
+                .flatMap((@NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) -> NetManager.get().getInstallDeceDetailRx())
                 .observeOn(Schedulers.io())
                 .flatMap((@NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) -> Observable.fromIterable(listBaseResponse.entity))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(installNeceModel -> Timber.d("test7 onNext model.name = %s", installNeceModel.name));
+                .subscribe(installNeceModel -> Timber.d("test7 onNext model.name = %s", installNeceModel.name),
+                        (Throwable throwable) -> Timber.d("test8 error %s", throwable.getMessage()),
+                        () -> Toast.makeText(this, "End!!", Toast.LENGTH_SHORT).show());
     }
 }
