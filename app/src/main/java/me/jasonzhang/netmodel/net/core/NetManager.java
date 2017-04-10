@@ -1,16 +1,15 @@
 package me.jasonzhang.netmodel.net.core;
 
-import android.annotation.SuppressLint;
-import android.util.AndroidRuntimeException;
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.util.ArrayMap;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import me.jasonzhang.netmodel.net.model.InstallNeceModel;
 import me.jasonzhang.netmodel.net.model.UpgradeModel;
 import okhttp3.HttpUrl;
@@ -34,8 +33,7 @@ public class NetManager {
     private ApiService apiService = null;
     private RxApiService rxApiService = null;
     private HttpLoggingInterceptor loggingInterceptor;
-    @SuppressLint("NewApi")
-    private ArrayMap<String, String> commonParamMap = new ArrayMap<>(10);
+    private Map<String, String> commonParamMap = null;
     private static volatile NetManager sInstance;
     private NetManager() {
         retrofit = new Retrofit.Builder()
@@ -46,6 +44,17 @@ public class NetManager {
                 .build();
         apiService = retrofit.create(ApiService.class);
         rxApiService = retrofit.create(RxApiService.class);
+
+        initCommonParamMap();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    private void initCommonParamMap() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            commonParamMap = new android.util.ArrayMap<>(10);
+        } else {
+            commonParamMap = new HashMap<>(10);
+        }
     }
     private OkHttpClient getClient() {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
@@ -121,9 +130,7 @@ public class NetManager {
     }
 
     public Observable<BaseResponse<UpgradeModel>> checkUpgradeRx(int versionCode, String channel) {
-        return rxApiService.checkUpgrade(versionCode, channel)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+        return rxApiService.checkUpgrade(versionCode, channel);
     }
     public Observable<BaseResponse<List<InstallNeceModel>>> getInstallDeceDetailRx() {
         return rxApiService.getInstallNeceDetail();
