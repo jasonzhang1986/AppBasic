@@ -59,27 +59,24 @@ public class NetManager {
     private OkHttpClient getClient() {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
         //添加一个网络的拦截器
-        clientBuilder.addInterceptor(new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request originalRequest = chain.request();
-                Request request;
-                if (commonParamMap.size()>0) {//如果公共参数个数大约0，生成新的request
-                    HttpUrl originalHttpUrl = originalRequest.url();
-                    HttpUrl.Builder builder = originalHttpUrl.newBuilder();
-                    for (String key : commonParamMap.keySet()) {
-                        builder.addQueryParameter(key, commonParamMap.get(key));
-                    }
-                    builder.addQueryParameter("timeStamp", String.valueOf(System.currentTimeMillis()));
-                    request = originalRequest.newBuilder()
-                            .url(builder.build())
-                            .method(originalRequest.method(), originalRequest.body())
-                            .build();
-                } else {
-                    request = originalRequest;
+        clientBuilder.addInterceptor(chain -> {
+            Request originalRequest = chain.request();
+            Request request;
+            if (commonParamMap.size()>0) {//如果公共参数个数大约0，生成新的request
+                HttpUrl originalHttpUrl = originalRequest.url();
+                HttpUrl.Builder builder = originalHttpUrl.newBuilder();
+                for (String key : commonParamMap.keySet()) {
+                    builder.addQueryParameter(key, commonParamMap.get(key));
                 }
-                return chain.proceed(request);
+                builder.addQueryParameter("timeStamp", String.valueOf(System.currentTimeMillis()));
+                request = originalRequest.newBuilder()
+                        .url(builder.build())
+                        .method(originalRequest.method(), originalRequest.body())
+                        .build();
+            } else {
+                request = originalRequest;
             }
+            return chain.proceed(request);
         });
         //添加log拦截器
         loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
