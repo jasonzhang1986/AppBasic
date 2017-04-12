@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import me.jasonzhang.appbase.net.API;
 import me.jasonzhang.appbase.net.core.NetManager;
-import timber.log.Timber;
+import me.jasonzhang.appbase.utils.LoggerUtils;
 
 /**
  * Created by JifengZhang on 2017/4/6.
@@ -18,10 +18,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        //在这里先使用Timber.plant注册一个Tree，然后调用静态的.d .v 去使用
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
+        LoggerUtils.initialize(true);
         NetManager.get(API.BASE_URL).setCommonParameter(getCommonParams());
     }
 

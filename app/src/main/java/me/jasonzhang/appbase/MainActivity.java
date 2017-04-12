@@ -22,7 +22,7 @@ import me.jasonzhang.appbase.net.core.BaseResponse;
 import me.jasonzhang.appbase.net.core.NetManager;
 import me.jasonzhang.appbase.net.model.InstallNeceModel;
 import me.jasonzhang.appbase.net.model.UpgradeModel;
-import timber.log.Timber;
+import me.jasonzhang.appbase.utils.LoggerUtils;
 
 public class MainActivity extends Activity implements View.OnClickListener {
     private ApiService apiService ;
@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 .subscribe(new Consumer<BaseResponse<UpgradeModel>>() {
                     @Override
                     public void accept(@NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) throws Exception {
-                        Timber.d("checkUpgradeRx onNext %s", upgradeModelBaseResponse.entity.url);
+                        LoggerUtils.d("checkUpgradeRx onNext %s", upgradeModelBaseResponse.entity.url);
                     }
                 });
     }
@@ -61,7 +61,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 .subscribe(new Consumer<BaseResponse<List<InstallNeceModel>>>() {
                     @Override
                     public void accept(@NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) throws Exception {
-                        Timber.d("getInstallDeceDetail onNext size = %d", listBaseResponse.entity.size());
+                        LoggerUtils.d("getInstallDeceDetail onNext size = %d", listBaseResponse.entity.size());
                     }
                 });
     }
@@ -77,7 +77,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @Override
             public String apply(@NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse,
                                 @NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) throws Exception {
-                Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
+                LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
                 return String.valueOf(listBaseResponse.entity.size());
             }
         }).subscribeOn(Schedulers.io())
@@ -88,12 +88,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onNext(String s) {
-                Timber.d("onNext size = %s | %s", s, Thread.currentThread().getName());
+                LoggerUtils.d("onNext size = %s | %s", s, Thread.currentThread().getName());
             }
 
             @Override
             public void onError(Throwable e) {
-                Timber.e(e, "onError ");
+                LoggerUtils.e(e, "onError ");
             }
 
             @Override
@@ -111,13 +111,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 apiService.checkUpgrade(5800, "LETV_X443"),
                 apiService.getInstallNeceDetail(),
                 (upgradeModelBaseResponse, listBaseResponse) -> {
-                    Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
+                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
                     return String.valueOf(listBaseResponse.entity.size());
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe( s -> Timber.d("onNext size = %s | %s", s, Thread.currentThread().getName()),
-                        throwable -> Timber.d(throwable,"onError"),
-                        () -> Timber.d("onComplete"));
+                .subscribe( s -> LoggerUtils.d("onNext size = %s | %s", s, Thread.currentThread().getName()),
+                        throwable -> LoggerUtils.d(throwable,"onError"),
+                        () -> LoggerUtils.d("onComplete"));
     }
 
     /**
@@ -126,13 +126,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void test5() {
         apiService.checkUpgrade(5800, "LETV_X443").zipWith(apiService.getInstallNeceDetail(),
                 (upgradeModelBaseResponse, listBaseResponse) -> {
-                    Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
+                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
                     return String.valueOf(listBaseResponse.entity.size());
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe( s -> Timber.d("onNext size = %s | %s", s, Thread.currentThread().getName()),
-                        throwable -> Timber.d(throwable,"onError"),
-                        () -> Timber.d("onComplete"));
+                .subscribe( s -> LoggerUtils.d("onNext size = %s | %s", s, Thread.currentThread().getName()),
+                        throwable -> LoggerUtils.d(throwable,"onError"),
+                        () -> LoggerUtils.d("onComplete"));
     }
 
     private void test6() {
@@ -153,7 +153,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 .subscribe(new Consumer<BaseResponse<List<InstallNeceModel>>>() {//Android主线程，由observeOn()指定
                     @Override
                     public void accept(@NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) throws Exception {
-                        Timber.d("getInstallDeceDetail onNext size = %d", listBaseResponse.entity.size());
+                        LoggerUtils.d("getInstallDeceDetail onNext size = %d", listBaseResponse.entity.size());
                     }
                 });
     }
@@ -189,12 +189,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 .subscribe(new Consumer<InstallNeceModel>() {
                     @Override
                     public void accept(@NonNull InstallNeceModel installNeceModel) throws Exception {
-                        Timber.d("test7 onNext model.name = %s", installNeceModel.name);
+                        LoggerUtils.d("test7 onNext model.name = %s", installNeceModel.name);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) throws Exception {
-                        Timber.d("Error!");
+                        LoggerUtils.d("Error!");
                     }
                 }, new Action() {
                     @Override
@@ -218,8 +218,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 .observeOn(Schedulers.io())
                 .flatMap((@NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) -> Observable.fromIterable(listBaseResponse.entity))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(installNeceModel -> Timber.d("test7 onNext model.name = %s", installNeceModel.name),
-                        (Throwable throwable) -> Timber.d("test8 error %s", throwable.getMessage()),
+                .subscribe(installNeceModel -> LoggerUtils.d("test7 onNext model.name = %s", installNeceModel.name),
+                        (Throwable throwable) -> LoggerUtils.d("test8 error %s", throwable.getMessage()),
                         () -> Toast.makeText(this, "End!!", Toast.LENGTH_SHORT).show());
     }
 }
