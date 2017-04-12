@@ -99,6 +99,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         });
     }
+    private void test4() {
+        Observable.zip(
+                NetManager.get().checkUpgrade(5800, "LETV_X443"),
+                NetManager.get().getInstallDeceDetail(),
+                (upgradeModelBaseResponse, listBaseResponse) -> {
+                    Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread());
+                    return String.valueOf(listBaseResponse.entity.size());
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe( s -> Timber.d("onNext size = %s | %s", s, Thread.currentThread()),
+                        throwable -> Timber.d(throwable,"onError"),
+                        () -> Timber.d("onComplete"));
+    }
 
     private void test6() {
         /**
