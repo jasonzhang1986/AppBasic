@@ -17,8 +17,7 @@ import me.jasonzhang.appbase.net.API;
 import me.jasonzhang.appbase.net.ApiService;
 import me.jasonzhang.appbase.net.core.BaseResponse;
 import me.jasonzhang.appbase.net.core.NetManager;
-import me.jasonzhang.appbase.net.model.InstallNeceModel;
-import me.jasonzhang.appbase.net.model.UpgradeModel;
+import me.jasonzhang.appbase.net.model.GankBean;
 import me.jasonzhang.appbase.utils.LoggerUtils;
 
 /**
@@ -48,14 +47,14 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void testRxJava() {
-        mSubscriptions.add(mApiService.checkUpgrade(5800, "LETV_X443")
+        mSubscriptions.add(mApiService.getAndroidData(5, 1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<BaseResponse<UpgradeModel>>() {
+                .subscribe(new Consumer<BaseResponse<List<GankBean>>>() {
                     @Override
-                    public void accept(@io.reactivex.annotations.NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) throws Exception {
-                        LoggerUtils.d("checkUpgradeRx onNext %s", upgradeModelBaseResponse.entity.url);
-                        mMainView.setResultText("testRxJava onNext updateUrl = " + upgradeModelBaseResponse.entity.url);
+                    public void accept(@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> gankBean) throws Exception {
+                        LoggerUtils.d("checkUpgradeRx onNext %s", gankBean.results.get(0).desc);
+                        mMainView.setResultText("testRxJava onNext desc = " + gankBean.results.get(0).desc);
                     }
                 }));
     }
@@ -63,14 +62,14 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void testZip() {
         mSubscriptions.add(Observable.zip(
-                mApiService.checkUpgrade(5800, "LETV_X443"),
-                mApiService.getInstallNeceDetail(),
-                new BiFunction<BaseResponse<UpgradeModel>, BaseResponse<List<InstallNeceModel>>, String>() {
+                mApiService.getAndroidData(5, 1),
+                mApiService.getIOSData(4,1),
+                new BiFunction<BaseResponse<List<GankBean>>, BaseResponse<List<GankBean>>, String>() {
                     @Override
-                    public String apply(@io.reactivex.annotations.NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse,
-                                        @io.reactivex.annotations.NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) throws Exception {
-                        LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
-                        return String.valueOf(listBaseResponse.entity.size());
+                    public String apply(@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> gankBean1,
+                                        @io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> gankBean2) throws Exception {
+                        LoggerUtils.d("zip apply size = %d | %s", gankBean1.results.size(), Thread.currentThread().getName());
+                        return String.valueOf(gankBean1.results.size());
                     }
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -95,10 +94,10 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void testZipWith() {
-        mSubscriptions.add(mApiService.checkUpgrade(5800, "LETV_X443").zipWith(mApiService.getInstallNeceDetail(),
+        mSubscriptions.add(mApiService.getAndroidData(5, 1).zipWith(mApiService.getIOSData(3,1),
                 (upgradeModelBaseResponse, listBaseResponse) -> {
-                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
-                    return String.valueOf(listBaseResponse.entity.size());
+                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.results.size(), Thread.currentThread().getName());
+                    return String.valueOf(listBaseResponse.results.size());
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<String>() {
@@ -123,11 +122,11 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void testZipUseLambda() {
         mSubscriptions.add(Observable.zip(
-                mApiService.checkUpgrade(5800, "LETV_X443"),
-                mApiService.getInstallNeceDetail(),
+                mApiService.getAndroidData(5, 1),
+                mApiService.getIOSData(3,1),
                 (upgradeModelBaseResponse, listBaseResponse) -> {
-                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
-                    return String.valueOf(listBaseResponse.entity.size());
+                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.results.size(), Thread.currentThread().getName());
+                    return String.valueOf(listBaseResponse.results.size());
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe( s -> {
@@ -141,10 +140,10 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void testZipWithUseLambda() {
-        mSubscriptions.add(mApiService.checkUpgrade(5800, "LETV_X443").zipWith(mApiService.getInstallNeceDetail(),
+        mSubscriptions.add(mApiService.getAndroidData(5, 1).zipWith(mApiService.getIOSData(3,1),
                 (upgradeModelBaseResponse, listBaseResponse) -> {
-                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
-                    return String.valueOf(listBaseResponse.entity.size());
+                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.results.size(), Thread.currentThread().getName());
+                    return String.valueOf(listBaseResponse.results.size());
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe( s -> {
@@ -161,7 +160,7 @@ public class MainPresenter implements MainContract.Presenter {
         /**
          * request1结束后使用request1的结果请求request2，request2结果是list，对list进行分解输出
          */
-        mSubscriptions.add(mApiService.checkUpgrade(5800, "LETV_X443")
+        mSubscriptions.add(mApiService.getAndroidData(5, 1)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(new Consumer<Disposable>() {
                     @Override
@@ -171,26 +170,26 @@ public class MainPresenter implements MainContract.Presenter {
                 })
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
-                .flatMap(new Function<BaseResponse<UpgradeModel>, Observable<BaseResponse<List<InstallNeceModel>>>>() {//IO线程，由observeOn()指定
+                .flatMap(new Function<BaseResponse<List<GankBean>>, Observable<BaseResponse<List<GankBean>>>>() {//IO线程，由observeOn()指定
                     @Override
-                    public Observable<BaseResponse<List<InstallNeceModel>>> apply(
-                            @io.reactivex.annotations.NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) throws Exception {
-                        return mApiService.getInstallNeceDetail();
+                    public Observable<BaseResponse<List<GankBean>>> apply(
+                            @io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> upgradeModelBaseResponse) throws Exception {
+                        return mApiService.getIOSData(3,1);
                     }
                 })
                 .observeOn(Schedulers.io())
-                .flatMap(new Function<BaseResponse<List<InstallNeceModel>>, Observable<InstallNeceModel>>() {
+                .flatMap(new Function<BaseResponse<List<GankBean>>, Observable<GankBean>>() {
                     @Override
-                    public Observable<InstallNeceModel> apply(@io.reactivex.annotations.NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) throws Exception {
-                        return Observable.fromIterable(listBaseResponse.entity);
+                    public Observable<GankBean> apply(@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> listBaseResponse) throws Exception {
+                        return Observable.fromIterable(listBaseResponse.results);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<InstallNeceModel>() {
+                .subscribe(new Consumer<GankBean>() {
                     @Override
-                    public void accept(@io.reactivex.annotations.NonNull InstallNeceModel installNeceModel) throws Exception {
-                        LoggerUtils.d("testComplex onNext model.name = %s", installNeceModel.name);
-                        mMainView.setResultText("testComplex onNext "+ installNeceModel.name);
+                    public void accept(@io.reactivex.annotations.NonNull GankBean gankBean) throws Exception {
+                        LoggerUtils.d("testComplex onNext gankBean.desc = %s", gankBean.desc);
+                        mMainView.setResultText("testComplex onNext "+ gankBean.desc);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -211,16 +210,19 @@ public class MainPresenter implements MainContract.Presenter {
          * request1结束后使用request1的结果请求request2，request2结果是list，对list进行分解输出
          * 使用lambda, 添加在开始执行的时候显示begin的提示(可以是showProgressBar)，在结束(Complete)的时候显示End的提示(隐藏ProgressBar)
          */
-        mSubscriptions.add(mApiService.checkUpgrade(5800, "LETV_X443")
+        mSubscriptions.add(mApiService.getAndroidData(5, 1)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe((@io.reactivex.annotations.NonNull Disposable disposable) -> mMainView.showBegin("ComplexUseLambda invoke Begin!!!"))
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
-                .flatMap((@io.reactivex.annotations.NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) -> mApiService.getInstallNeceDetail())
+                .flatMap((@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> upgradeModelBaseResponse) -> mApiService.getIOSData(3, 1))
                 .observeOn(Schedulers.io())
-                .flatMap((@io.reactivex.annotations.NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) -> Observable.fromIterable(listBaseResponse.entity))
+                .flatMap((@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> listBaseResponse) -> Observable.fromIterable(listBaseResponse.results))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(installNeceModel -> mMainView.setResultText("testComplexUseLambda onNext model.name = " + installNeceModel.name),
+                .subscribe(gankBean -> {
+                            LoggerUtils.d("testComplexUseLambda onNext bean.desc = %s", gankBean.desc);
+                            mMainView.setResultText("testComplexUseLambda onNext bean.desce = " + gankBean.desc);
+                        },
                         (Throwable throwable) -> LoggerUtils.d("test8 error %s", throwable.getMessage()),
                         () ->  mMainView.showEnd("ComplexUseLambda invoke Complete!!!")));
     }

@@ -5,7 +5,6 @@ package me.jasonzhang.appbase.net.core;
  */
 
 public class BaseResponse<T>{
-    public int status;
-    public String message;
-    public T entity;
+    public boolean error;
+    public T results;
 }

@@ -68,7 +68,7 @@ public class MainActivity extends BaseActivity implements MainContract.View{
             sb = new StringBuilder();
         }
         sb.append(result);
-        mResult.setText(sb.append(result).toString());
+        mResult.setText(sb.toString());
     }
 
     @Override
