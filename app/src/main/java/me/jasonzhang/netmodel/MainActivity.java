@@ -2,20 +2,17 @@ package me.jasonzhang.netmodel;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
-import java.io.IOException;
 import java.util.List;
-
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -23,9 +20,6 @@ import me.jasonzhang.netmodel.net.core.BaseResponse;
 import me.jasonzhang.netmodel.net.core.NetManager;
 import me.jasonzhang.netmodel.net.model.InstallNeceModel;
 import me.jasonzhang.netmodel.net.model.UpgradeModel;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import timber.log.Timber;
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -41,55 +35,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn:
-                test8();
+                test3();
                 break;
         }
     }
 
     private void test1() {
-        NetManager.get().checkUpgradeAsync(5800, "LETV_X443", new Callback<BaseResponse<UpgradeModel>>() {
-            @Override
-            public void onResponse(Call<BaseResponse<UpgradeModel>> call, Response<BaseResponse<UpgradeModel>> response) {
-                Timber.i("checkUpgradeAsync onResponse");
-            }
-
-            @Override
-            public void onFailure(Call<BaseResponse<UpgradeModel>> call, Throwable t) {
-
-            }
-        });
-    }
-    public void test2() {
-        NetManager.get().getInstallDeceDetailAsync(callback);
-    }
-    private Callback<BaseResponse<List<InstallNeceModel>>> callback = new Callback<BaseResponse<List<InstallNeceModel>>>() {
-        @Override
-        public void onResponse(Call<BaseResponse<List<InstallNeceModel>>> call, Response<BaseResponse<List<InstallNeceModel>>> response) {
-            Timber.i("getInstallDeceDetailAsync onResponse：%s", response.body().entity);
-        }
-
-        @Override
-        public void onFailure(Call<BaseResponse<List<InstallNeceModel>>> call, Throwable t) {
-
-        }
-    };
-
-    private void test3() {
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    NetManager.get().checkUpgrade(5800, "LETV_X443");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    private void test4() {
-        NetManager.get().checkUpgradeRx(5800, "LETV_X443")
+        NetManager.get().checkUpgrade(5800, "LETV_X443")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<BaseResponse<UpgradeModel>>() {
@@ -99,8 +51,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                 });
     }
-    private void test5() {
-        NetManager.get().getInstallDeceDetailRx()
+    private void test2() {
+        NetManager.get().getInstallDeceDetail()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<BaseResponse<List<InstallNeceModel>>>() {
@@ -111,18 +63,55 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 });
     }
 
+    /**
+     * 两个接口都返回之后做操作
+     */
+    private void test3() {
+        Observable.zip(
+                NetManager.get().checkUpgrade(5800, "LETV_X443"),
+                NetManager.get().getInstallDeceDetail(),
+                new BiFunction<BaseResponse<UpgradeModel>, BaseResponse<List<InstallNeceModel>>, String>() {
+            @Override
+            public String apply(@NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse,
+                                @NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) throws Exception {
+                Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread());
+                return String.valueOf(listBaseResponse.entity.size());
+            }
+        }).subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<String>() {
+            @Override
+            public void onSubscribe(Disposable d) {}
+
+            @Override
+            public void onNext(String s) {
+                Timber.d("onNext size = %s | %s", s, Thread.currentThread());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Timber.e(e, "onError ");
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+    }
+
     private void test6() {
         /**
          * request1结束后使用request1的结果请求request2
          */
-        NetManager.get().checkUpgradeRx(5800, "LETV_X443")
+        NetManager.get().checkUpgrade(5800, "LETV_X443")
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .flatMap(new Function<BaseResponse<UpgradeModel>, ObservableSource<BaseResponse<List<InstallNeceModel>>>>() {//IO线程，由observeOn()指定
                     @Override
                     public ObservableSource<BaseResponse<List<InstallNeceModel>>> apply(
                             @NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) throws Exception {
-                        return NetManager.get().getInstallDeceDetailRx();
+                        return NetManager.get().getInstallDeceDetail();
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -137,7 +126,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         /**
          * request1结束后使用request1的结果请求request2，request2结果是list，对list进行分解输出
          */
-        NetManager.get().checkUpgradeRx(5800, "LETV_X443")
+        NetManager.get().checkUpgrade(5800, "LETV_X443")
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(new Consumer<Disposable>() {
                     @Override
@@ -151,7 +140,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     @Override
                     public Observable<BaseResponse<List<InstallNeceModel>>> apply(
                             @NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) throws Exception {
-                        return NetManager.get().getInstallDeceDetailRx();
+                        return NetManager.get().getInstallDeceDetail();
                     }
                 })
                 .observeOn(Schedulers.io())
@@ -185,12 +174,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
          * request1结束后使用request1的结果请求request2，request2结果是list，对list进行分解输出
          * 使用lambda, 添加在开始执行的时候显示begin的提示(可以是showProgressBar)，在结束(Complete)的时候显示End的提示(隐藏ProgressBar)
          */
-        NetManager.get().checkUpgradeRx(5800, "LETV_X443")
+        NetManager.get().checkUpgrade(5800, "LETV_X443")
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe((@NonNull Disposable disposable) -> Toast.makeText(this, "Begin!!!", Toast.LENGTH_SHORT).show())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
-                .flatMap((@NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) -> NetManager.get().getInstallDeceDetailRx())
+                .flatMap((@NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse) -> NetManager.get().getInstallDeceDetail())
                 .observeOn(Schedulers.io())
                 .flatMap((@NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) -> Observable.fromIterable(listBaseResponse.entity))
                 .observeOn(AndroidSchedulers.mainThread())

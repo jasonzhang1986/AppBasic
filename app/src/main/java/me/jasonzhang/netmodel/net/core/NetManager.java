@@ -29,22 +29,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class NetManager {
-    private Retrofit retrofit = null;
-    private ApiService apiService = null;
     private RxApiService rxApiService = null;
     private HttpLoggingInterceptor loggingInterceptor;
     private Map<String, String> commonParamMap = null;
     private static volatile NetManager sInstance;
     private NetManager() {
-        retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(getClient())
                 .build();
-        apiService = retrofit.create(ApiService.class);
         rxApiService = retrofit.create(RxApiService.class);
-
         initCommonParamMap();
     }
 
@@ -59,25 +55,7 @@ public class NetManager {
     private OkHttpClient getClient() {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
         //添加一个网络的拦截器
-        clientBuilder.addInterceptor(chain -> {
-            Request originalRequest = chain.request();
-            Request request;
-            if (commonParamMap.size()>0) {//如果公共参数个数大约0，生成新的request
-                HttpUrl originalHttpUrl = originalRequest.url();
-                HttpUrl.Builder builder = originalHttpUrl.newBuilder();
-                for (String key : commonParamMap.keySet()) {
-                    builder.addQueryParameter(key, commonParamMap.get(key));
-                }
-                builder.addQueryParameter("timeStamp", String.valueOf(System.currentTimeMillis()));
-                request = originalRequest.newBuilder()
-                        .url(builder.build())
-                        .method(originalRequest.method(), originalRequest.body())
-                        .build();
-            } else {
-                request = originalRequest;
-            }
-            return chain.proceed(request);
-        });
+        clientBuilder.addInterceptor(commonParaInterceptor);
         //添加log拦截器
         loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
         clientBuilder.addInterceptor(loggingInterceptor);
@@ -95,6 +73,28 @@ public class NetManager {
     }
 
     /**
+     * 公共参数拦截器
+     */
+    private Interceptor commonParaInterceptor = chain -> {
+        Request originalRequest = chain.request();
+        Request newRequest;
+        if (commonParamMap.size()>0) {//如果公共参数个数大约0，生成新的request
+            HttpUrl originalHttpUrl = originalRequest.url();
+            HttpUrl.Builder builder = originalHttpUrl.newBuilder();
+            for (String key : commonParamMap.keySet()) {
+                builder.addQueryParameter(key, commonParamMap.get(key));
+            }
+            builder.addQueryParameter("timeStamp", String.valueOf(System.currentTimeMillis()));
+            newRequest = originalRequest.newBuilder()
+                    .url(builder.build())
+                    .method(originalRequest.method(), originalRequest.body())
+                    .build();
+        } else {
+            newRequest = originalRequest;
+        }
+        return chain.proceed(newRequest);
+    };
+    /**
      * 设置log等级
      * @param level
      */
@@ -107,29 +107,10 @@ public class NetManager {
         commonParamMap.putAll(paraMap);
     }
 
-    public Response<BaseResponse<UpgradeModel>> checkUpgrade(int versionCode, String channel) throws IOException {
-        return apiService.checkUpgrade(versionCode, channel).execute();
-    }
-    public Call<BaseResponse<UpgradeModel>> checkUpgradeAsync(int versionCode, String channel, Callback<BaseResponse<UpgradeModel>> callback) {
-        Call<BaseResponse<UpgradeModel>> call = apiService.checkUpgrade(versionCode, channel);
-        call.enqueue(callback);
-        return call;
-    }
-
-    public Response<BaseResponse<List<InstallNeceModel>>> getInstallDeceDetail() throws IOException {
-        return apiService.getInstallNeceDetail().execute();
-    }
-
-    public Call<BaseResponse<List<InstallNeceModel>>> getInstallDeceDetailAsync(Callback<BaseResponse<List<InstallNeceModel>>> callback) {
-        Call<BaseResponse<List<InstallNeceModel>>> call = apiService.getInstallNeceDetail();
-        call.enqueue(callback);
-        return call;
-    }
-
-    public Observable<BaseResponse<UpgradeModel>> checkUpgradeRx(int versionCode, String channel) {
+    public Observable<BaseResponse<UpgradeModel>> checkUpgrade(int versionCode, String channel) {
         return rxApiService.checkUpgrade(versionCode, channel);
     }
-    public Observable<BaseResponse<List<InstallNeceModel>>> getInstallDeceDetailRx() {
+    public Observable<BaseResponse<List<InstallNeceModel>>> getInstallDeceDetail() {
         return rxApiService.getInstallNeceDetail();
     }
 }
