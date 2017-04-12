@@ -1,15 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.jasonzhang.appbase.MainActivity">
+    >
 
     <Button
-        android:id="@+id/btn"
+        android:id="@+id/btn1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:layout_centerInParent="true"/>
-
+        android:text="textRxJava"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"/>
+    <Button
+        android:id="@+id/btn2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="testZip"
+        android:layout_below="@id/btn1"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"/>
+    <Button
+        android:id="@+id/btn3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="testZipWith"
+        android:layout_below="@id/btn2"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"/>
+    <Button
+        android:id="@+id/btn4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="testZipUseLambda"
+        android:layout_below="@id/btn3"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"/>
+    <Button
+        android:id="@+id/btn5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="testZipWithUseLambda"
+        android:layout_marginLeft="50dp"
+        android:layout_below="@id/btn4"
+        android:layout_marginTop="30dp"/>
+    <Button
+        android:id="@+id/btn6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="testComplex"
+        android:layout_below="@id/btn5"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"/>
+    <Button
+        android:id="@+id/btn7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn6"
+        android:text="testComplexUseLambda"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="30dp"/>
+    <TextView
+        android:id="@+id/tv_result"
+        android:layout_width="800dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="20dp"
+        />
 </RelativeLayout>
