@@ -1,12 +1,10 @@
 package me.jasonzhang.appbase.module.main;
 
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -15,7 +13,6 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import me.jasonzhang.appbase.*;
 import me.jasonzhang.appbase.net.API;
 import me.jasonzhang.appbase.net.ApiService;
 import me.jasonzhang.appbase.net.core.BaseResponse;
