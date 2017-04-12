@@ -1,4 +1,4 @@
-package me.jasonzhang.netmodel;
+package me.jasonzhang.appbase;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,10 +16,10 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import me.jasonzhang.netmodel.net.core.BaseResponse;
-import me.jasonzhang.netmodel.net.core.NetManager;
-import me.jasonzhang.netmodel.net.model.InstallNeceModel;
-import me.jasonzhang.netmodel.net.model.UpgradeModel;
+import me.jasonzhang.appbase.net.core.BaseResponse;
+import me.jasonzhang.appbase.net.core.NetManager;
+import me.jasonzhang.appbase.net.model.InstallNeceModel;
+import me.jasonzhang.appbase.net.model.UpgradeModel;
 import timber.log.Timber;
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -74,7 +74,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @Override
             public String apply(@NonNull BaseResponse<UpgradeModel> upgradeModelBaseResponse,
                                 @NonNull BaseResponse<List<InstallNeceModel>> listBaseResponse) throws Exception {
-                Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread());
+                Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
                 return String.valueOf(listBaseResponse.entity.size());
             }
         }).subscribeOn(Schedulers.io())
@@ -85,7 +85,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onNext(String s) {
-                Timber.d("onNext size = %s | %s", s, Thread.currentThread());
+                Timber.d("onNext size = %s | %s", s, Thread.currentThread().getName());
             }
 
             @Override
@@ -99,16 +99,35 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         });
     }
+
+    /**
+     * test3方法的lambda写法
+     */
     private void test4() {
         Observable.zip(
                 NetManager.get().checkUpgrade(5800, "LETV_X443"),
                 NetManager.get().getInstallDeceDetail(),
                 (upgradeModelBaseResponse, listBaseResponse) -> {
-                    Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread());
+                    Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
                     return String.valueOf(listBaseResponse.entity.size());
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe( s -> Timber.d("onNext size = %s | %s", s, Thread.currentThread()),
+                .subscribe( s -> Timber.d("onNext size = %s | %s", s, Thread.currentThread().getName()),
+                        throwable -> Timber.d(throwable,"onError"),
+                        () -> Timber.d("onComplete"));
+    }
+
+    /**
+     * zipWith
+     */
+    private void test5() {
+        NetManager.get().checkUpgrade(5800, "LETV_X443").zipWith(NetManager.get().getInstallDeceDetail(),
+                (upgradeModelBaseResponse, listBaseResponse) -> {
+                    Timber.d("zip apply size = %d | %s", listBaseResponse.entity.size(), Thread.currentThread().getName());
+                    return String.valueOf(listBaseResponse.entity.size());
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe( s -> Timber.d("onNext size = %s | %s", s, Thread.currentThread().getName()),
                         throwable -> Timber.d(throwable,"onError"),
                         () -> Timber.d("onComplete"));
     }
