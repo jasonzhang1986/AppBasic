@@ -1,4 +1,4 @@
-# NetModel
+# AppBase
 1. 主要是学习Retrofit框架，使用OKHttpClient和Gson解析
 
 2. 理解execute和enqueue两种方式(同步和异步)
@@ -150,7 +150,9 @@
 
    ​
 
-7. 配置文件
+7. MVP架构
+
+8. 配置文件
 
    ```groovy
    buildscript {
@@ -211,6 +213,9 @@
        compile 'io.reactivex.rxjava2:rxjava:2.0.8'
        compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
        compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
+       compile 'com.android.support:support-v4:25.3.1'
+       compile 'com.jakewharton:butterknife:8.5.1'
+       annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
    }
    ```
 
