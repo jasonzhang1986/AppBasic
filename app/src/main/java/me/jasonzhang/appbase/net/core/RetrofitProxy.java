@@ -1,47 +1,57 @@
-package me.jasonzhang.netmodel.net.core;
+package me.jasonzhang.appbase.net.core;
 
 import android.annotation.TargetApi;
 import android.os.Build;
-import android.util.ArrayMap;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
-import me.jasonzhang.netmodel.net.model.InstallNeceModel;
-import me.jasonzhang.netmodel.net.model.UpgradeModel;
+import me.jasonzhang.appbase.BuildConfig;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Created by JifengZhang on 2017/4/5.
+ * 功能：
+ *  1、初始化retrofit, 使用OkHttp，GsonConvert，RxJava2
+ *  2、设置公共参数
+ *  3、添加log拦截器，输出不同类型的log
+ * Created by JifengZhang on 2017/4/12.
  */
 
-public class NetManager {
-    private RxApiService rxApiService = null;
+public class RetrofitProxy {
+    private static volatile RetrofitProxy sInstance;
+    private Retrofit retrofit;
     private HttpLoggingInterceptor loggingInterceptor;
     private Map<String, String> commonParamMap = null;
-    private static volatile NetManager sInstance;
-    private NetManager() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_URL)
+    private RetrofitProxy(String baseUrl) {
+        retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(getClient())
                 .build();
-        rxApiService = retrofit.create(RxApiService.class);
         initCommonParamMap();
+    }
+
+    static RetrofitProxy get(String baseUrl) {
+        if (sInstance ==null) {
+            synchronized (RetrofitProxy.class) {
+                if (sInstance ==null) {
+                    sInstance = new RetrofitProxy(baseUrl);
+                }
+            }
+        }
+        return sInstance;
+    }
+
+    Retrofit getRetrofit() {
+        return retrofit;
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
@@ -57,19 +67,12 @@ public class NetManager {
         //添加一个网络的拦截器
         clientBuilder.addInterceptor(commonParaInterceptor);
         //添加log拦截器
-        loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
+        loggingInterceptor = new HttpLoggingInterceptor();
+        if (BuildConfig.DEBUG) {
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        }
         clientBuilder.addInterceptor(loggingInterceptor);
         return clientBuilder.build();
-    }
-    public static NetManager get() {
-        if (sInstance==null) {
-            synchronized (NetManager.class) {
-                if (sInstance==null) {
-                    sInstance = new NetManager();
-                }
-            }
-        }
-        return sInstance;
     }
 
     /**
@@ -98,19 +101,12 @@ public class NetManager {
      * 设置log等级
      * @param level
      */
-    public void setLogLevel(HttpLoggingInterceptor.Level level) {
+    void setLogLevel(HttpLoggingInterceptor.Level level) {
         loggingInterceptor.setLevel(level);
     }
 
-    public void setCommonParameter(Map<String, String> paraMap) {
+    void setCommonParameter(Map<String, String> paraMap) {
         commonParamMap.clear();
         commonParamMap.putAll(paraMap);
-    }
-
-    public Observable<BaseResponse<UpgradeModel>> checkUpgrade(int versionCode, String channel) {
-        return rxApiService.checkUpgrade(versionCode, channel);
-    }
-    public Observable<BaseResponse<List<InstallNeceModel>>> getInstallDeceDetail() {
-        return rxApiService.getInstallNeceDetail();
     }
 }

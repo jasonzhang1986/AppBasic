@@ -1,4 +1,4 @@
-package me.jasonzhang.netmodel;
+package me.jasonzhang.appbase;
 
 import android.app.Application;
 
@@ -6,7 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
-import me.jasonzhang.netmodel.net.core.NetManager;
+import me.jasonzhang.appbase.net.API;
+import me.jasonzhang.appbase.net.core.NetManager;
 import timber.log.Timber;
 
 /**
@@ -21,7 +22,7 @@ public class MyApplication extends Application {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
-        NetManager.get().setCommonParameter(getCommonParams());
+        NetManager.get(API.BASE_URL).setCommonParameter(getCommonParams());
     }
 
     private HashMap<String, String> getCommonParams() {

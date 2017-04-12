@@ -1,4 +1,4 @@
-package me.jasonzhang.netmodel.net.model;
+package me.jasonzhang.appbase.net.model;
 
 import java.util.List;
 

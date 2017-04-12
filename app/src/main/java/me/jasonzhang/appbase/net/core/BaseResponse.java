@@ -1,4 +1,4 @@
-package me.jasonzhang.netmodel.net.core;
+package me.jasonzhang.appbase.net.core;
 
 /**
  * Created by JifengZhang on 2017/4/5.
