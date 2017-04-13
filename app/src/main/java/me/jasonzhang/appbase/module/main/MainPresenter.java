@@ -221,7 +221,7 @@ public class MainPresenter implements MainContract.Presenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(gankBean -> {
                             LoggerUtils.d("testComplexUseLambda onNext bean.desc = %s", gankBean.desc);
-                            mMainView.setResultText("testComplexUseLambda onNext bean.desce = " + gankBean.desc);
+                            mMainView.setResultText("testComplexUseLambda onNext bean.desc = " + gankBean.desc);
                         },
                         (Throwable throwable) -> LoggerUtils.d("test8 error %s", throwable.getMessage()),
                         () ->  mMainView.showEnd("ComplexUseLambda invoke Complete!!!")));
