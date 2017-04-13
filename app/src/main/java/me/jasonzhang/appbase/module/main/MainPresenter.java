@@ -19,7 +19,7 @@ import me.jasonzhang.appbase.net.ApiService;
 import me.jasonzhang.appbase.net.core.BaseResponse;
 import me.jasonzhang.appbase.net.core.NetManager;
 import me.jasonzhang.appbase.net.model.GankBean;
-import me.jasonzhang.appbase.utils.LoggerUtils;
+import timber.log.Timber;
 
 /**
  * Created by JifengZhang on 2017/4/12.
@@ -54,7 +54,7 @@ public class MainPresenter implements MainContract.Presenter {
                 .subscribe(new Consumer<BaseResponse<List<GankBean>>>() {
                     @Override
                     public void accept(@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> gankBean) throws Exception {
-                        LoggerUtils.d("checkUpgradeRx Android Data[0].desc %s", gankBean.results.get(0).desc);
+                        Timber.d("checkUpgradeRx Android Data[0].desc %s", gankBean.results.get(0).desc);
                         mMainView.setResultText("testRxJava Android Data[0].desc = " + gankBean.results.get(0).desc);
                     }
                 }));
@@ -72,7 +72,7 @@ public class MainPresenter implements MainContract.Presenter {
                         List<GankBean> list = new ArrayList<GankBean>();
                         list.addAll(gankBean1.results);
                         list.addAll(gankBean2.results);
-                        LoggerUtils.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
+                        Timber.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
                         return list;
                     }
                 }).subscribeOn(Schedulers.io())
@@ -103,7 +103,7 @@ public class MainPresenter implements MainContract.Presenter {
                     List<GankBean> list = new ArrayList<GankBean>();
                     list.addAll(listBaseResponse1.results);
                     list.addAll(listBaseResponse2.results);
-                    LoggerUtils.d("zipWith size = %d | %s", list.size(), Thread.currentThread().getName());
+                    Timber.d("zipWith size = %d | %s", list.size(), Thread.currentThread().getName());
                     return list;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -135,7 +135,7 @@ public class MainPresenter implements MainContract.Presenter {
                     List<GankBean> list = new ArrayList<>();
                     list.addAll(gankBean1.results);
                     list.addAll(gankBean2.results);
-                    LoggerUtils.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
+                    Timber.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
                     return list;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -152,16 +152,16 @@ public class MainPresenter implements MainContract.Presenter {
                     List<GankBean> list = new ArrayList<>();
                     list.addAll(listBaseResponse1.results);
                     list.addAll(listBaseResponse.results);
-                    LoggerUtils.d("testZipWithUseLambda apply size = %d | %s", list.size(), Thread.currentThread().getName());
+                    Timber.d("testZipWithUseLambda apply size = %d | %s", list.size(), Thread.currentThread().getName());
                     return list;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe( list -> {
-                            LoggerUtils.d("onNext size = %s | %s", list.toString(), Thread.currentThread().getName());
+                            Timber.d("onNext size = %s | %s", list.toString(), Thread.currentThread().getName());
                             mMainView.setResultText("testZipWithUseLambda size = " + list.toString());
                         },
-                        throwable -> LoggerUtils.d(throwable,"onError"),
-                        () -> LoggerUtils.d("onComplete")
+                        throwable -> Timber.d(throwable,"onError"),
+                        () -> Timber.d("onComplete")
                 ));
     }
 
@@ -198,13 +198,13 @@ public class MainPresenter implements MainContract.Presenter {
                 .subscribe(new Consumer<GankBean>() {
                     @Override
                     public void accept(@io.reactivex.annotations.NonNull GankBean gankBean) throws Exception {
-                        LoggerUtils.d("testComplex onNext gankBean.desc = %s", gankBean.desc);
+                        Timber.d("testComplex onNext gankBean.desc = %s", gankBean.desc);
                         mMainView.setResultText("testComplex onNext "+ gankBean);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception {
-                        LoggerUtils.d("Error!");
+                        Timber.d("Error!");
                     }
                 }, new Action() {
                     @Override
@@ -230,10 +230,10 @@ public class MainPresenter implements MainContract.Presenter {
                 .flatMap((@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> listBaseResponse) -> Observable.fromIterable(listBaseResponse.results))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(gankBean -> {
-                            LoggerUtils.d("testComplexUseLambda onNext bean = %s", gankBean);
+                            Timber.d("testComplexUseLambda onNext bean = %s", gankBean);
                             mMainView.setResultText("testComplexUseLambda onNext bean = " + gankBean);
                         },
-                        (Throwable throwable) -> LoggerUtils.d("test8 error %s", throwable.getMessage()),
+                        (Throwable throwable) -> Timber.d("test8 error %s", throwable.getMessage()),
                         () ->  mMainView.showEnd("ComplexUseLambda invoke Complete!!!")));
     }
 }

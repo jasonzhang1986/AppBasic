@@ -22,9 +22,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class NetManager {
-    private Retrofit retrofit;
-    private HttpLoggingInterceptor loggingInterceptor;
+    private Retrofit retrofit = null;
+    private HttpLoggingInterceptor loggingInterceptor = null;
     private Map<String, String> commonParamMap = null;
+    private Object apiService = null;
     private static ConcurrentHashMap<String, NetManager> sInstanceMap = new ConcurrentHashMap<>();
     private NetManager() {
     }
@@ -44,7 +45,14 @@ public class NetManager {
     }
 
     public <T> T getApiService(Class<T> cls) {
-        return retrofit.create(cls);
+        if (apiService==null) {
+            synchronized (NetManager.class) {
+                if (apiService==null) {
+                    apiService = retrofit.create(cls);
+                }
+            }
+        }
+        return (T)apiService;
     }
 
     /**
