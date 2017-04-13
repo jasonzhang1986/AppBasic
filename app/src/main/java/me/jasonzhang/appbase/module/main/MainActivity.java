@@ -25,11 +25,13 @@ public class MainActivity extends BaseActivity implements MainContract.View{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        mPresenter = new MainPresenter(this);
+        mPresenter = createPresenter();
     }
 
     @Override
-    public void setPresenter(MainContract.Presenter presenter) {}
+    public MainContract.Presenter createPresenter() {
+        return new MainPresenter(this);
+    }
 
     @OnClick({R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4, R.id.btn5, R.id.btn6, R.id.btn7})
     public void btnClick(View view) {
@@ -58,17 +60,9 @@ public class MainActivity extends BaseActivity implements MainContract.View{
         }
     }
 
-    private int lineNum;
     @Override
     public void setResultText(@Nullable String result) {
-        StringBuilder sb = mResult.getText()==null?new StringBuilder():new StringBuilder(mResult.getText()).append("\n\n");
-        lineNum +=2;
-        if (lineNum>30) {
-            lineNum = 0;
-            sb = new StringBuilder();
-        }
-        sb.append(result);
-        mResult.setText(sb.toString());
+        mResult.setText(result);
     }
 
     @Override

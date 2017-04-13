@@ -17,4 +17,9 @@ public class GankBean {
     public String url;
     public boolean userd;
     public String who;
+
+    @Override
+    public String toString() {
+        return desc + "["+type+"] "+"--"+who+"\n";
+    }
 }

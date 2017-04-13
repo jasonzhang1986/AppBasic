@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="textRxJava"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="20dp"/>
     <Button
         android:id="@+id/btn2"
         android:layout_width="wrap_content"
@@ -18,7 +18,7 @@
         android:text="testZip"
         android:layout_below="@id/btn1"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="20dp"/>
     <Button
         android:id="@+id/btn3"
         android:layout_width="wrap_content"
@@ -26,7 +26,7 @@
         android:text="testZipWith"
         android:layout_below="@id/btn2"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="20dp"/>
     <Button
         android:id="@+id/btn4"
         android:layout_width="wrap_content"
@@ -34,7 +34,7 @@
         android:text="testZipUseLambda"
         android:layout_below="@id/btn3"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="20dp"/>
     <Button
         android:id="@+id/btn5"
         android:layout_width="wrap_content"
@@ -42,7 +42,7 @@
         android:text="testZipWithUseLambda"
         android:layout_marginLeft="50dp"
         android:layout_below="@id/btn4"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="20dp"/>
     <Button
         android:id="@+id/btn6"
         android:layout_width="wrap_content"
@@ -50,7 +50,7 @@
         android:text="testComplex"
         android:layout_below="@id/btn5"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="20dp"/>
     <Button
         android:id="@+id/btn7"
         android:layout_width="wrap_content"
@@ -58,13 +58,13 @@
         android:layout_below="@id/btn6"
         android:text="testComplexUseLambda"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="20dp"/>
     <TextView
         android:id="@+id/tv_result"
-        android:layout_width="800dp"
+        android:layout_width="400dp"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
         android:layout_marginTop="30dp"
-        android:layout_marginRight="20dp"
+        android:layout_toRightOf="@id/btn7"
+        android:layout_marginLeft="50dp"
         />
 </RelativeLayout>

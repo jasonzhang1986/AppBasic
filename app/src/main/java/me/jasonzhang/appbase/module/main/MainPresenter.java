@@ -2,6 +2,7 @@ package me.jasonzhang.appbase.module.main;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -53,8 +54,8 @@ public class MainPresenter implements MainContract.Presenter {
                 .subscribe(new Consumer<BaseResponse<List<GankBean>>>() {
                     @Override
                     public void accept(@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> gankBean) throws Exception {
-                        LoggerUtils.d("checkUpgradeRx onNext %s", gankBean.results.get(0).desc);
-                        mMainView.setResultText("testRxJava onNext desc = " + gankBean.results.get(0).desc);
+                        LoggerUtils.d("checkUpgradeRx Android Data[0].desc %s", gankBean.results.get(0).desc);
+                        mMainView.setResultText("testRxJava Android Data[0].desc = " + gankBean.results.get(0).desc);
                     }
                 }));
     }
@@ -64,19 +65,22 @@ public class MainPresenter implements MainContract.Presenter {
         mSubscriptions.add(Observable.zip(
                 mApiService.getAndroidData(5, 1),
                 mApiService.getIOSData(4,1),
-                new BiFunction<BaseResponse<List<GankBean>>, BaseResponse<List<GankBean>>, String>() {
+                new BiFunction<BaseResponse<List<GankBean>>, BaseResponse<List<GankBean>>, List<GankBean>>() {
                     @Override
-                    public String apply(@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> gankBean1,
+                    public List<GankBean> apply(@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> gankBean1,
                                         @io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> gankBean2) throws Exception {
-                        LoggerUtils.d("zip apply size = %d | %s", gankBean1.results.size(), Thread.currentThread().getName());
-                        return String.valueOf(gankBean1.results.size());
+                        List<GankBean> list = new ArrayList<GankBean>();
+                        list.addAll(gankBean1.results);
+                        list.addAll(gankBean2.results);
+                        LoggerUtils.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
+                        return list;
                     }
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
+                .subscribe(new Consumer<List<GankBean>>() {
                                @Override
-                               public void accept(@io.reactivex.annotations.NonNull String s) throws Exception {
-                                   mMainView.setResultText("testZip onNext app size = " + s);
+                               public void accept(@io.reactivex.annotations.NonNull List<GankBean> list) throws Exception {
+                                   mMainView.setResultText("testZip result = " + list.toString());
                                }
                            }, new Consumer<Throwable>() {
                                @Override
@@ -95,15 +99,18 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void testZipWith() {
         mSubscriptions.add(mApiService.getAndroidData(5, 1).zipWith(mApiService.getIOSData(3,1),
-                (upgradeModelBaseResponse, listBaseResponse) -> {
-                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.results.size(), Thread.currentThread().getName());
-                    return String.valueOf(listBaseResponse.results.size());
+                (listBaseResponse1, listBaseResponse2) -> {
+                    List<GankBean> list = new ArrayList<GankBean>();
+                    list.addAll(listBaseResponse1.results);
+                    list.addAll(listBaseResponse2.results);
+                    LoggerUtils.d("zipWith size = %d | %s", list.size(), Thread.currentThread().getName());
+                    return list;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
+                .subscribe(new Consumer<List<GankBean>>() {
                                @Override
-                               public void accept(@io.reactivex.annotations.NonNull String s) throws Exception {
-                                   mMainView.setResultText("testZipWith onNext app size = " + s);
+                               public void accept(@io.reactivex.annotations.NonNull List<GankBean> list) throws Exception {
+                                   mMainView.setResultText("testZipWith onNext content = " + list.toString());
                                }
                            }, new Consumer<Throwable>() {
                                @Override
@@ -123,32 +130,35 @@ public class MainPresenter implements MainContract.Presenter {
     public void testZipUseLambda() {
         mSubscriptions.add(Observable.zip(
                 mApiService.getAndroidData(5, 1),
-                mApiService.getIOSData(3,1),
-                (upgradeModelBaseResponse, listBaseResponse) -> {
-                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.results.size(), Thread.currentThread().getName());
-                    return String.valueOf(listBaseResponse.results.size());
+                mApiService.getIOSData(4,1),
+                (gankBean1, gankBean2) -> {
+                    List<GankBean> list = new ArrayList<>();
+                    list.addAll(gankBean1.results);
+                    list.addAll(gankBean2.results);
+                    LoggerUtils.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
+                    return list;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe( s -> {
-                            LoggerUtils.d("onNext size = %s | %s", s, Thread.currentThread().getName());
-                            mMainView.setResultText("testZipUseLambda app size = " + s);
-                        },
-                        throwable -> LoggerUtils.d(throwable,"onError"),
-                        () -> LoggerUtils.d("onComplete")
+                .subscribe(list -> mMainView.setResultText("testZip result = " + list.toString()),
+                        throwable -> mMainView.showError("testZip onError"),
+                        () -> mMainView.showEnd("testZip Complete")
                 ));
     }
 
     @Override
     public void testZipWithUseLambda() {
         mSubscriptions.add(mApiService.getAndroidData(5, 1).zipWith(mApiService.getIOSData(3,1),
-                (upgradeModelBaseResponse, listBaseResponse) -> {
-                    LoggerUtils.d("zip apply size = %d | %s", listBaseResponse.results.size(), Thread.currentThread().getName());
-                    return String.valueOf(listBaseResponse.results.size());
+                (listBaseResponse1, listBaseResponse) -> {
+                    List<GankBean> list = new ArrayList<>();
+                    list.addAll(listBaseResponse1.results);
+                    list.addAll(listBaseResponse.results);
+                    LoggerUtils.d("testZipWithUseLambda apply size = %d | %s", list.size(), Thread.currentThread().getName());
+                    return list;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe( s -> {
-                            LoggerUtils.d("onNext size = %s | %s", s, Thread.currentThread().getName());
-                            mMainView.setResultText("testZipWithUseLambda size = " + s);
+                .subscribe( list -> {
+                            LoggerUtils.d("onNext size = %s | %s", list.toString(), Thread.currentThread().getName());
+                            mMainView.setResultText("testZipWithUseLambda size = " + list.toString());
                         },
                         throwable -> LoggerUtils.d(throwable,"onError"),
                         () -> LoggerUtils.d("onComplete")
@@ -189,7 +199,7 @@ public class MainPresenter implements MainContract.Presenter {
                     @Override
                     public void accept(@io.reactivex.annotations.NonNull GankBean gankBean) throws Exception {
                         LoggerUtils.d("testComplex onNext gankBean.desc = %s", gankBean.desc);
-                        mMainView.setResultText("testComplex onNext "+ gankBean.desc);
+                        mMainView.setResultText("testComplex onNext "+ gankBean);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -220,8 +230,8 @@ public class MainPresenter implements MainContract.Presenter {
                 .flatMap((@io.reactivex.annotations.NonNull BaseResponse<List<GankBean>> listBaseResponse) -> Observable.fromIterable(listBaseResponse.results))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(gankBean -> {
-                            LoggerUtils.d("testComplexUseLambda onNext bean.desc = %s", gankBean.desc);
-                            mMainView.setResultText("testComplexUseLambda onNext bean.desc = " + gankBean.desc);
+                            LoggerUtils.d("testComplexUseLambda onNext bean = %s", gankBean);
+                            mMainView.setResultText("testComplexUseLambda onNext bean = " + gankBean);
                         },
                         (Throwable throwable) -> LoggerUtils.d("test8 error %s", throwable.getMessage()),
                         () ->  mMainView.showEnd("ComplexUseLambda invoke Complete!!!")));
