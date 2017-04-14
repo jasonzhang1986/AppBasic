@@ -2,12 +2,16 @@ package me.jasonzhang.appbase;
 
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
 import me.jasonzhang.appbase.net.API;
 import me.jasonzhang.appbase.net.core.NetManager;
+import okhttp3.logging.HttpLoggingInterceptor;
 import timber.log.Timber;
 
 /**
@@ -19,7 +23,15 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Timber.plant(new Timber.DebugTree());
-        NetManager.get(API.BASE_URL).setCommonParameter(getCommonParams());
+        Stetho.initializeWithDefaults(this);
+        initNetManager();
+    }
+
+    private void initNetManager() {
+        NetManager manager = NetManager.get(API.BASE_URL);
+        manager.setCommonParameter(getCommonParams());
+        manager.addNetworkInterceptor(new StethoInterceptor());
+        manager.setLogLevel(HttpLoggingInterceptor.Level.BODY);
     }
 
     private HashMap<String, String> getCommonParams() {
