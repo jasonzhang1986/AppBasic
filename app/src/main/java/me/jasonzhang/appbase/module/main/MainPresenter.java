@@ -36,8 +36,6 @@ class MainPresenter extends BasePresenter<MainView>{
         mApiService = NetManager.get(API.BASE_URL).getApiService(ApiService.class);
     }
 
-
-
     void testRxJava() {
         mSubscriptions.add(mApiService.getAndroidData(5, 1)
                 .subscribeOn(Schedulers.io())

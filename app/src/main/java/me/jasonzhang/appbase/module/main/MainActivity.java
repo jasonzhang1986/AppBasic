@@ -6,6 +6,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.jasonzhang.appbase.R;
 import me.jasonzhang.appbase.base.BaseActivity;
@@ -67,6 +68,11 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
     @Override
     protected int getContentLayoutId() {
         return R.layout.activity_main;
+    }
+
+    @Override
+    protected void init() {
+        ButterKnife.bind(this);
     }
 
     @Override
