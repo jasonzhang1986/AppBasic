@@ -3,11 +3,9 @@ package me.jasonzhang.appbase.net;
 import java.util.List;
 
 import io.reactivex.Observable;
-import me.jasonzhang.appbase.net.core.BaseResponse;
 import me.jasonzhang.appbase.net.model.GankBean;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 /**
  * Created by JifengZhang on 2017/4/6.

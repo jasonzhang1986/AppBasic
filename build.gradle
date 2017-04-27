@@ -15,6 +15,9 @@ allprojects {
     repositories {
         jcenter()
         mavenCentral()
+        maven {
+            url NEXUS_REPOSITORY_URL
+        }
     }
 }
 

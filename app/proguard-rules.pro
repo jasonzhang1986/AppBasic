@@ -15,11 +15,28 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
-
+-optimizationpasses 5
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-dontpreverify
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
+
+-dontwarn
+-dontskipnonpubliclibraryclassmembers
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+
+-verbose
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-renamesourcefileattribute SourceFile
+
+##Utils相关
+-keep class com.blankj.utilcode.** { *; }
+-keepclassmembers class com.blankj.utilcode.** { *; }
+-dontwarn com.blankj.utilcode.**

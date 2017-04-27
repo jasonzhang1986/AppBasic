@@ -11,16 +11,13 @@ public class BaseFragment<T extends BasePresenter> extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (presenter!=null) {
-            presenter.subscribe();
-        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         if (presenter!=null) {
-            presenter.unsubscribe();
+            presenter.unSubscribe();
         }
     }
 }

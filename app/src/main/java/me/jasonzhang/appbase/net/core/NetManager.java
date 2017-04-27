@@ -64,6 +64,7 @@ public class NetManager {
                 }
             }
         }
+        //noinspection unchecked
         return (T)apiService;
     }
 
