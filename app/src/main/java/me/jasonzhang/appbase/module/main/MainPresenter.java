@@ -19,7 +19,7 @@ import me.jasonzhang.appbase.net.API;
 import me.jasonzhang.appbase.net.ApiService;
 import me.jasonzhang.appbase.net.BaseResponse;
 import me.jasonzhang.appbase.net.core.NetManager;
-import me.jasonzhang.appbase.net.core.RxTransformer;
+import me.jasonzhang.appbase.base.RxTransformer;
 import me.jasonzhang.appbase.net.model.GankBean;
 import timber.log.Timber;
 

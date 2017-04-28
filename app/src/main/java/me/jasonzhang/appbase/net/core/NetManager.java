@@ -70,7 +70,7 @@ public class NetManager {
 
     /**
      * 设置log等级
-     * @param level
+     * @param level log的等级
      */
     public void setLogLevel(HttpLoggingInterceptor.Level level) {
         if (retrofit!=null) {
@@ -88,7 +88,7 @@ public class NetManager {
 
     /**
      * 设置公共参数
-     * @param paraMap
+     * @param paraMap 参数列表
      */
     public void setCommonParameter(Map<String, String> paraMap) {
         if (retrofit!=null) {
