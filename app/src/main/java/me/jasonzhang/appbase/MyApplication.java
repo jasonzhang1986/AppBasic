@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.leplay.android.utils.Utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -12,7 +13,6 @@ import java.util.HashMap;
 import me.jasonzhang.appbase.net.API;
 import me.jasonzhang.appbase.net.core.NetManager;
 import okhttp3.logging.HttpLoggingInterceptor;
-import timber.log.Timber;
 
 /**
  * Created by JifengZhang on 2017/4/6.
@@ -22,7 +22,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Timber.plant(new Timber.DebugTree());
+        Utils.initialize(this);
         Stetho.initializeWithDefaults(this);
         initNetManager();
     }

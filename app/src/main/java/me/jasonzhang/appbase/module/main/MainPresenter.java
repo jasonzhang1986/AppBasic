@@ -4,6 +4,8 @@ package me.jasonzhang.appbase.module.main;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.leplay.android.utils.LogUtils;
+
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -21,7 +23,6 @@ import me.jasonzhang.appbase.net.BaseResponse;
 import me.jasonzhang.appbase.net.core.NetManager;
 import me.jasonzhang.appbase.base.RxTransformer;
 import me.jasonzhang.appbase.net.model.GankBean;
-import timber.log.Timber;
 
 /**
  * Created by JifengZhang on 2017/4/12.
@@ -43,7 +44,7 @@ class MainPresenter extends BasePresenter<MainView>{
                 .subscribe(new Consumer<BaseResponse<List<GankBean>>>() {
                     @Override
                     public void accept(@NonNull BaseResponse<List<GankBean>> gankBean) throws Exception {
-                        Timber.d("checkUpgradeRx Android Data[0].desc %s", gankBean.results.get(0).desc);
+                        LogUtils.d("checkUpgradeRx Android Data[0].desc %s", gankBean.results.get(0).desc);
                         getView().setResultText("testRxJava Android Data[0].desc = " + gankBean.results.get(0).desc);
                     }
                 }));
@@ -60,7 +61,7 @@ class MainPresenter extends BasePresenter<MainView>{
                         List<GankBean> list = new ArrayList<GankBean>();
                         list.addAll(gankBean1.results);
                         list.addAll(gankBean2.results);
-                        Timber.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
+                        LogUtils.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
                         return list;
                     }
                 }).subscribeOn(Schedulers.io())
@@ -93,7 +94,7 @@ class MainPresenter extends BasePresenter<MainView>{
                         List<GankBean> list = new ArrayList<GankBean>();
                         list.addAll(listBaseResponse1.results);
                         list.addAll(listBaseResponse2.results);
-                        Timber.d("zipWith size = %d | %s", list.size(), Thread.currentThread().getName());
+                        LogUtils.d("zipWith size = %d | %s", list.size(), Thread.currentThread().getName());
                         return list;
                     }
                 }).subscribeOn(Schedulers.io())
@@ -125,7 +126,7 @@ class MainPresenter extends BasePresenter<MainView>{
                     List<GankBean> list = new ArrayList<>();
                     list.addAll(gankBean1.results);
                     list.addAll(gankBean2.results);
-                    Timber.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
+                    LogUtils.d("zip apply size = %d | %s", list.size(), Thread.currentThread().getName());
                     return list;
                 })
                 .compose(RxTransformer.schedulersTransformer())
@@ -141,16 +142,16 @@ class MainPresenter extends BasePresenter<MainView>{
                     List<GankBean> list = new ArrayList<>();
                     list.addAll(listBaseResponse1.results);
                     list.addAll(listBaseResponse.results);
-                    Timber.d("testZipWithUseLambda apply size = %d | %s", list.size(), Thread.currentThread().getName());
+                    LogUtils.d("testZipWithUseLambda apply size = %d | %s", list.size(), Thread.currentThread().getName());
                     return list;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe( list -> {
-                            Timber.d("onNext size = %s | %s", list.toString(), Thread.currentThread().getName());
+                            LogUtils.d("onNext size = %s | %s", list.toString(), Thread.currentThread().getName());
                             getView().setResultText("testZipWithUseLambda size = " + list.toString());
                         },
-                        throwable -> Timber.d(throwable,"onError"),
-                        () -> Timber.d("onComplete")
+                        throwable -> LogUtils.d(throwable, "testZipWithUseLambda"),
+                        () -> LogUtils.d("onComplete")
                 ));
     }
 
@@ -186,13 +187,13 @@ class MainPresenter extends BasePresenter<MainView>{
                 .subscribe(new Consumer<GankBean>() {
                     @Override
                     public void accept(@NonNull GankBean gankBean) throws Exception {
-                        Timber.d("testComplex onNext gankBean.desc = %s", gankBean.desc);
+                        LogUtils.d("testComplex onNext gankBean.desc = %s", gankBean.desc);
                         getView().setResultText("testComplex onNext "+ gankBean);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) throws Exception {
-                        Timber.d("Error!");
+                        LogUtils.d("Error!");
                     }
                 }, new Action() {
                     @Override
@@ -217,10 +218,10 @@ class MainPresenter extends BasePresenter<MainView>{
                 .flatMap((@NonNull BaseResponse<List<GankBean>> listBaseResponse) -> Observable.fromIterable(listBaseResponse.results))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(gankBean -> {
-                            Timber.d("testComplexUseLambda onNext bean = %s", gankBean);
+                            LogUtils.d("testComplexUseLambda onNext bean = %s", gankBean);
                             getView().setResultText("testComplexUseLambda onNext bean = " + gankBean);
                         },
-                        (Throwable throwable) -> Timber.d("test8 error %s", throwable.getMessage()),
+                        (Throwable throwable) -> LogUtils.d("test8 error %s", throwable.getMessage()),
                         () ->  getView().showEnd("ComplexUseLambda invoke Complete!!!")));
     }
 

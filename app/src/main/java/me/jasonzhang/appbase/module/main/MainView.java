@@ -7,7 +7,7 @@ import me.jasonzhang.appbase.base.BaseView;
  */
 
 public interface MainView extends BaseView{
-    void setResultText(String result);
+    String setResultText(String result);
     void showError(String errMsg);
     void showBegin(String msg);
     void showEnd(String msg);

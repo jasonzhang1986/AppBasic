@@ -1,16 +1,17 @@
 package me.jasonzhang.appbase.base;
 
+import com.leplay.android.utils.LogUtils;
+
 import java.lang.ref.WeakReference;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-
-import timber.log.Timber;
 
 /**
  * Created by JifengZhang on 2017/4/12.
  */
 
 public abstract class BasePresenter<T extends BaseView> {
+    private static final String TAG = "BasePresenter";
     private WeakReference<T> mViewRef;
     private T nullView;
     protected BasePresenter() {
@@ -36,18 +37,18 @@ public abstract class BasePresenter<T extends BaseView> {
     }
 
     void attachView(T view) {
-        Timber.d("attachView");
+        LogUtils.d(TAG,"attachView");
         mViewRef = new WeakReference<>(view);
     }
     void detachView() {
-        Timber.d("detachView");
+        LogUtils.d(TAG,"detachView");
         if (mViewRef != null) {
             mViewRef.clear();
             mViewRef = null;
         }
     }
     public T getView() {
-        Timber.d("getView mViewRef = " + mViewRef);
+        LogUtils.d(TAG,"getView mViewRef = " + mViewRef);
         if (mViewRef != null) {
             T view = mViewRef.get();
             if (view != null) {

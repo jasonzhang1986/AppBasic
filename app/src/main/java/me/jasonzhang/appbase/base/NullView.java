@@ -1,5 +1,7 @@
 package me.jasonzhang.appbase.base;
 
+import com.leplay.android.utils.LogUtils;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ public class NullView {
 
     private static class DefaultValueInvocationHandler implements InvocationHandler {
         @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            LogUtils.d("NullView invoke %s, returnType = %s" , method.toString(), method.getReturnType());
             return NullViewDefaults.defaultValue(method.getReturnType());
         }
     }

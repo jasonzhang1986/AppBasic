@@ -46,8 +46,9 @@ public class MainActivity extends BaseActivity<MainPresenter> implements MainVie
     }
 
     @Override
-    public void setResultText(@Nullable String result) {
+    public String setResultText(@Nullable String result) {
         mResult.setText(result);
+        return null;
     }
 
     @Override
