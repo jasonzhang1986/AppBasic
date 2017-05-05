@@ -1,4 +1,4 @@
-package me.jasonzhang.appbase.net;
+package me.jasonzhang.app.net;
 
 /**
  * Created by JifengZhang on 2017/4/5.

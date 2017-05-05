@@ -1,4 +1,4 @@
-package me.jasonzhang.appbase.base;
+package me.jasonzhang.app.base;
 
 /**
  * Created by JifengZhang on 2017/4/12.

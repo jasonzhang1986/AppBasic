@@ -1,4 +1,4 @@
-package me.jasonzhang.appbase.base;
+package me.jasonzhang.app.base;
 
 import io.reactivex.ObservableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;

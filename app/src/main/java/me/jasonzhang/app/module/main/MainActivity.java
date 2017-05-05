@@ -1,4 +1,4 @@
-package me.jasonzhang.appbase.module.main;
+package me.jasonzhang.app.module.main;
 
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -8,8 +8,8 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import me.jasonzhang.appbase.R;
-import me.jasonzhang.appbase.base.BaseActivity;
+import me.jasonzhang.app.R;
+import me.jasonzhang.app.base.BaseActivity;
 
 /**
  * Created by JifengZhang on 2017/4/12.

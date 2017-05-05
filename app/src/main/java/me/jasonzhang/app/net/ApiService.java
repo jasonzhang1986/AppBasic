@@ -1,9 +1,9 @@
-package me.jasonzhang.appbase.net;
+package me.jasonzhang.app.net;
 
 import java.util.List;
 
 import io.reactivex.Observable;
-import me.jasonzhang.appbase.net.model.GankBean;
+import me.jasonzhang.app.net.model.GankBean;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 

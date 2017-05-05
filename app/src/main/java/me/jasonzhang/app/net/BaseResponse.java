@@ -1,4 +1,4 @@
-package me.jasonzhang.appbase.net;
+package me.jasonzhang.app.net;
 
 /**
  * Response的处理类，我们关注的是result字段

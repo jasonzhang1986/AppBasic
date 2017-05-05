@@ -1,4 +1,4 @@
-package me.jasonzhang.appbase.base;
+package me.jasonzhang.app.base;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;

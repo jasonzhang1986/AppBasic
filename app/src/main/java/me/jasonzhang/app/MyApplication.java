@@ -1,4 +1,4 @@
-package me.jasonzhang.appbase;
+package me.jasonzhang.app;
 
 import android.app.Application;
 
@@ -10,8 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
-import me.jasonzhang.appbase.net.API;
-import me.jasonzhang.appbase.net.core.NetManager;
+import me.jasonzhang.app.net.API;
+import me.jasonzhang.app.net.core.NetManager;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**

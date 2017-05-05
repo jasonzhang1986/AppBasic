@@ -1,9 +1,7 @@
-package me.jasonzhang.appbase.net.core;
+package me.jasonzhang.app.net.core;
 
 import android.annotation.TargetApi;
 import android.os.Build;
-
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.io.IOException;
 import java.util.ArrayList;

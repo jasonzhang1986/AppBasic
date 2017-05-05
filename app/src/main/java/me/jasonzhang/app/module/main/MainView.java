@@ -1,6 +1,6 @@
-package me.jasonzhang.appbase.module.main;
+package me.jasonzhang.app.module.main;
 
-import me.jasonzhang.appbase.base.BaseView;
+import me.jasonzhang.app.base.BaseView;
 
 /**
  * Created by JifengZhang on 2017/4/27.

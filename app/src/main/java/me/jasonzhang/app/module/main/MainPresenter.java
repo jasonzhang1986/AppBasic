@@ -1,4 +1,4 @@
-package me.jasonzhang.appbase.module.main;
+package me.jasonzhang.app.module.main;
 
 
 import java.util.ArrayList;
@@ -16,13 +16,13 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import me.jasonzhang.appbase.base.BasePresenter;
-import me.jasonzhang.appbase.net.API;
-import me.jasonzhang.appbase.net.ApiService;
-import me.jasonzhang.appbase.net.BaseResponse;
-import me.jasonzhang.appbase.net.core.NetManager;
-import me.jasonzhang.appbase.base.RxTransformer;
-import me.jasonzhang.appbase.net.model.GankBean;
+import me.jasonzhang.app.base.BasePresenter;
+import me.jasonzhang.app.net.API;
+import me.jasonzhang.app.net.ApiService;
+import me.jasonzhang.app.net.BaseResponse;
+import me.jasonzhang.app.net.core.NetManager;
+import me.jasonzhang.app.base.RxTransformer;
+import me.jasonzhang.app.net.model.GankBean;
 
 /**
  * Created by JifengZhang on 2017/4/12.

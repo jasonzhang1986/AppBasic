@@ -1,4 +1,4 @@
-package me.jasonzhang.appbase.base;
+package me.jasonzhang.app.base;
 
 import com.leplay.android.utils.LogUtils;
 
