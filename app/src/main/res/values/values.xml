@@ -8,7 +8,7 @@
         <attr name="cv_text_all_caps" format="boolean" />
         <attr name="cv_background_color" format="color" />
         <attr name="cv_min_size" format="dimension" />
-        <attr name="cv_padding" format="dimension" />
+        <attr name="cv_text_padding" format="dimension" />
         <attr name="cv_gravity" format="enum">
             <enum name="TOP_LEFT" value="51" />
             <enum name="TOP_RIGHT" value="53" />

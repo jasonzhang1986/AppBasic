@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2016 hejunlin <hejunlin2013@gmail.com>
- * Github:https://github.com/hejunlin2013/TVSample
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package me.jasonzhang.app.widget;
 
 import android.content.Context;
@@ -24,6 +9,10 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import me.jasonzhang.app.R;
 
@@ -38,7 +27,7 @@ public class CornerVew extends View {
     private boolean mTextAllCaps;
     private int mBackgroundColor;
     private float mMinSize;
-    private float mPadding;
+    private int mTextPadding;
     private int mGravity;
     private static final int DEFAULT_DEGREES = 45;
 
@@ -67,7 +56,7 @@ public class CornerVew extends View {
         mFillTriangle = ta.getBoolean(R.styleable.CornerVew_cv_fill_triangle, false);
         mBackgroundColor = ta.getColor(R.styleable.CornerVew_cv_background_color, Color.parseColor("#FF4081"));
         mMinSize = ta.getDimension(R.styleable.CornerVew_cv_min_size, mFillTriangle ? dp2px(35) : dp2px(50));
-        mPadding = ta.getDimension(R.styleable.CornerVew_cv_padding, dp2px(3.5f));
+        mTextPadding = (int)(ta.getDimension(R.styleable.CornerVew_cv_text_padding, dp2px(5f))+0.5f);
         mGravity = ta.getInt(R.styleable.CornerVew_cv_gravity, Gravity.TOP | Gravity.LEFT);
         ta.recycle();
     }
@@ -99,7 +88,6 @@ public class CornerVew extends View {
                 mPath.lineTo(size, size);
                 mPath.close();
                 canvas.drawPath(mPath, mBackgroundPaint);
-
                 drawTextWhenFill(size, DEFAULT_DEGREES, canvas, true);
             } else if (mGravity == (Gravity.BOTTOM | Gravity.LEFT)) {
                 mPath.reset();
@@ -121,7 +109,7 @@ public class CornerVew extends View {
                 drawTextWhenFill(size, -DEFAULT_DEGREES, canvas, false);
             }
         } else {
-            double delta = (textHeight + mPadding * 2) * Math.sqrt(2);
+            double delta = (textHeight + mTextPadding * 2) * Math.sqrt(2);
             if (mGravity == (Gravity.TOP | Gravity.LEFT)) {
                 mPath.reset();
                 mPath.moveTo(0, (float) (size - delta));
@@ -169,7 +157,7 @@ public class CornerVew extends View {
     private void drawText(int size, float degrees, Canvas canvas, float textHeight, boolean isTop) {
         canvas.save();
         canvas.rotate(degrees, size / 2f, size / 2f);
-        float delta = isTop ? -(textHeight + mPadding * 2) / 2 : (textHeight + mPadding * 2) / 2;
+        float delta = isTop ? -(textHeight + mTextPadding * 2) / 2 : (textHeight + mTextPadding * 2) / 2;
         float textBaseY = size / 2 - (mTextPaint.descent() + mTextPaint.ascent()) / 2 + delta;
         canvas.drawText(mTextAllCaps ? mTextContent.toUpperCase() : mTextContent,
                 getPaddingLeft() + (size - getPaddingLeft() - getPaddingRight()) / 2, textBaseY, mTextPaint);
@@ -190,6 +178,29 @@ public class CornerVew extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int measuredWidth = measureWidth(widthMeasureSpec);
         setMeasuredDimension(measuredWidth, measuredWidth);
+
+        //以下代码是根据设置的cv:gravity值设定控件在父布局中的位置
+        ViewGroup.LayoutParams params = getLayoutParams();
+        if (params instanceof FrameLayout.LayoutParams) {
+            ((FrameLayout.LayoutParams)getLayoutParams()).gravity = mGravity;
+        } else if (params instanceof LinearLayout.LayoutParams) {
+            ((LinearLayout.LayoutParams)getLayoutParams()).gravity = mGravity;
+        }
+        if(getParent() instanceof RelativeLayout) {
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) getLayoutParams();
+            if ((mGravity&Gravity.LEFT) == Gravity.LEFT) {
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+            }
+            if ((mGravity&Gravity.TOP) == Gravity.TOP) {
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+            }
+            if ((mGravity&Gravity.RIGHT) == Gravity.RIGHT) {
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+            }
+            if ((mGravity&Gravity.BOTTOM) == Gravity.BOTTOM) {
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            }
+        }
     }
 
     private int measureWidth(int widthMeasureSpec) {

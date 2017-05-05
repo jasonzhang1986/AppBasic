@@ -43,7 +43,7 @@ public class MetroActivity extends Activity {
 //        metroViewBorderImpl.setBackgroundResource(R.drawable.border_color);
         metroViewBorderImpl.setBackgroundResource(R.drawable.home_focus);
         metroViewBorderImpl.getViewBorder().setScale(1.2f);
-
+        metroViewBorderImpl.getViewBorder().setMargin(40);
         ViewGroup list = (ViewGroup) findViewById(R.id.list);
         metroViewBorderImpl.attachTo(list);
 

@@ -97,13 +97,13 @@
                 <me.jasonzhang.app.widget.CornerVew
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
+                    android:paddingLeft="5dp"
+                    android:paddingTop="5dp"
                     cv:cv_background_color="#5EB335"
                     cv:cv_fill_triangle="true"
                     cv:cv_gravity="TOP_LEFT"
                     cv:cv_text="VIP"
                     cv:cv_text_size="15sp" />
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
@@ -138,12 +138,11 @@
                 <me.jasonzhang.app.widget.CornerVew
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
                     cv:cv_background_color="#5EB335"
                     cv:cv_fill_triangle="true"
-                    cv:cv_gravity="TOP_LEFT"
+                    cv:cv_gravity="TOP_RIGHT"
                     cv:cv_text="VIP"
                     cv:cv_text_size="15sp" />
 
@@ -186,13 +185,13 @@
                 <me.jasonzhang.app.widget.CornerVew
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    cv:cv_background_color="#5EB335"
+                    cv:cv_background_color="@android:color/holo_red_dark"
                     cv:cv_fill_triangle="true"
-                    cv:cv_gravity="TOP_LEFT"
-                    cv:cv_text="VIP"
+                    cv:cv_gravity="BOTTOM_LEFT"
+                    cv:cv_text="热卖"
+                    cv:cv_text_color="@color/white"
                     cv:cv_text_size="15sp" />
 
                 <TextView
@@ -231,12 +230,11 @@
                 <me.jasonzhang.app.widget.CornerVew
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
                     cv:cv_background_color="#5EB335"
                     cv:cv_fill_triangle="true"
-                    cv:cv_gravity="TOP_LEFT"
+                    cv:cv_gravity="BOTTOM_RIGHT"
                     cv:cv_text="VIP"
                     cv:cv_text_size="15sp" />
 
@@ -256,14 +254,15 @@
                 android:id="@+id/view5"
                 android:layout_width="208dp"
                 android:layout_height="200dp"
-                android:layout_alignBaseline="@+id/view"
                 android:layout_gravity="top"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:layout_toRightOf="@+id/view4"
                 android:layout_alignTop="@+id/view"
                 android:focusable="true"
+                android:background="@drawable/border_shape"
                 app:radius="4dp" >
 
                 <ImageView

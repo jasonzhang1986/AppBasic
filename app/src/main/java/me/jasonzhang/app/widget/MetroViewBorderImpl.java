@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2016 hejunlin <hejunlin2013@gmail.com>
- * Github:https://github.com/hejunlin2013/TVSample
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package me.jasonzhang.app.widget;
 
 import android.app.Activity;
@@ -23,14 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-public class MetroViewBorderImpl<X extends View> implements ViewTreeObserver.OnGlobalFocusChangeListener, ViewTreeObserver.OnScrollChangedListener, ViewTreeObserver.OnGlobalLayoutListener, ViewTreeObserver.OnTouchModeChangeListener {
+public class MetroViewBorderImpl<T extends View> implements ViewTreeObserver.OnGlobalFocusChangeListener, ViewTreeObserver.OnScrollChangedListener, ViewTreeObserver.OnGlobalLayoutListener, ViewTreeObserver.OnTouchModeChangeListener {
 
     private static final String TAG = MetroViewBorderImpl.class.getSimpleName();
 
     private ViewGroup mViewGroup;
     private IMetroViewBorder mMetroViewBorder;
 
-    private X mView;
+    private T mView;
     private View mLastView;
 
     public MetroViewBorderImpl(Context context) {
@@ -47,24 +32,24 @@ public class MetroViewBorderImpl<X extends View> implements ViewTreeObserver.OnG
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
         mMetroViewBorder = new MetroViewBorderHandler();
-        mView = (X) new View(context, attrs, defStyleAttr);
+        mView = (T) new View(context, attrs, defStyleAttr);
     }
 
-    public MetroViewBorderImpl(X view) {
+    public MetroViewBorderImpl(T view) {
         this.mView = view;
         mMetroViewBorder = new MetroViewBorderHandler();
     }
 
-    public MetroViewBorderImpl(X view, IMetroViewBorder border) {
+    public MetroViewBorderImpl(T view, IMetroViewBorder border) {
         this.mView = view;
         mMetroViewBorder = border;
     }
 
     public MetroViewBorderImpl(Context context, int resId) {
-        this((X) LayoutInflater.from(context).inflate(resId, null, false));
+        this((T) LayoutInflater.from(context).inflate(resId, null, false));
     }
 
-    public X getView() {
+    public T getView() {
         return mView;
     }
 
@@ -117,7 +102,10 @@ public class MetroViewBorderImpl<X extends View> implements ViewTreeObserver.OnG
     }
 
     public void attachTo(ViewGroup viewGroup) {
-        ((MetroViewBorderHandler)mMetroViewBorder).setMargin(mView.getPaddingRight()+10);
+        MetroViewBorderHandler viewBorderHandler = (MetroViewBorderHandler)mMetroViewBorder;
+        if (viewBorderHandler!=null && viewBorderHandler.getMargin()==0) {
+            viewBorderHandler.setMargin(mView.getPaddingRight() + 10);
+        }
         try {
             if (viewGroup == null) {
                 if (mView.getContext() instanceof Activity) {
@@ -155,7 +143,11 @@ public class MetroViewBorderImpl<X extends View> implements ViewTreeObserver.OnG
                 ViewTreeObserver viewTreeObserver = mViewGroup.getViewTreeObserver();
                 viewTreeObserver.removeOnGlobalFocusChangeListener(this);
                 viewTreeObserver.removeOnScrollChangedListener(this);
-                viewTreeObserver.removeOnGlobalLayoutListener(this);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                    viewTreeObserver.removeGlobalOnLayoutListener(this);
+                } else {
+                    viewTreeObserver.removeOnGlobalLayoutListener(this);
+                }
                 viewTreeObserver.removeOnTouchModeChangeListener(this);
                 mMetroViewBorder.OnDetach(mView, viewGroup);
             }
