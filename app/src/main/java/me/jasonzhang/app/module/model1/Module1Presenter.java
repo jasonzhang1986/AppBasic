@@ -1,4 +1,4 @@
-package me.jasonzhang.app.module.main;
+package me.jasonzhang.app.module.model1;
 
 
 import java.util.ArrayList;
@@ -28,11 +28,11 @@ import me.jasonzhang.app.net.model.GankBean;
  * Created by JifengZhang on 2017/4/12.
  */
 
-class MainPresenter extends BasePresenter<MainView>{
+class Module1Presenter extends BasePresenter<Module1View>{
     @NonNull
     private CompositeDisposable mSubscriptions;
     private ApiService mApiService;
-    MainPresenter() {
+    Module1Presenter() {
         mSubscriptions = new CompositeDisposable();
         mApiService = NetManager.get(API.BASE_URL).getApiService(ApiService.class);
     }
