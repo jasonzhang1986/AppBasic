@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".module.model1.Module1Activity" android:screenOrientation="landscape"/>
+        <activity android:name=".module.metro.MetroActivity" android:screenOrientation="landscape" />
     </application>
 
 </manifest>

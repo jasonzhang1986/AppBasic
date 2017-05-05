@@ -9,6 +9,7 @@ import android.view.View;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.jasonzhang.app.R;
+import me.jasonzhang.app.module.metro.MetroActivity;
 import me.jasonzhang.app.module.model1.Module1Activity;
 
 /**
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(this, Module1Activity.class));
                 break;
             case R.id.btn2:
-//                startActivity();
+                startActivity(new Intent(this, MetroActivity.class));
                 break;
         }
     }
